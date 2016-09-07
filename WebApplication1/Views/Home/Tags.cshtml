@@ -1,0 +1,43 @@
+﻿@{
+    ViewBag.Title = "Tags";
+}
+
+@section scripts{
+    <script type="text/javascript">
+        $('.btn-primary').off('click').on('click', function() {
+            if ($('#Url').val().length == 0) {
+                return alert("Please, enter job url");
+            }
+            $.ajax({
+                url: "/home/gethref",
+                data: {
+                    url: $("#Url").val()
+                },
+                type: "POST",
+                success: function(data) {
+                    if (data.list.length > 0) {
+                        if ($("#url-list li").length > 0) {
+                            $("#url-list li").remove();
+                        }
+                        $.each(data.list, function(i, e) {
+                            $("#url-list").append("<li>" + e + "</li>");
+                        });
+                    } else {
+                        $("#url-list").append("<li>No results</li>");
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+<div class="jumbotron">
+    <p class="lead">
+        @Html.TextBox("Url", "", new { @placeholder = "Enter URL here", @style = "width: 50%;" })
+        <a class="btn btn-primary btn-lg">Search</a>
+        <div>
+           This is a list of href URLs:
+            <ul id="url-list"></ul>
+        </div>
+    </p>
+</div>

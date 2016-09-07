@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "Jobs";
+}
+
+@section scripts{
+    <script type="text/javascript">
+        $('#JobTitle').autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    url: "/home/getjobstitles",
+                    data: {
+                        title: $('#JobTitle').val()
+                    },
+                    type: "POST",
+                    dataType: "json",
+                    success: function (data) {
+                        response($.map(data.list, function(v, i) {
+                            return {
+                                label: v
+                            };
+                        }));
+                    }
+                });
+            },
+            minLength: 2
+        });
+
+        $('.btn-primary').off('click').on('click', function() {
+            if ($('#JobTitle').val().length == 0) {
+                return alert("Please, enter job title");
+            }
+            $.ajax({
+                url: "/home/getjobs",
+                data: {
+                    title: $('#JobTitle').val()
+                },
+                type: "POST",
+                success: function(data) {
+                    if (data.list.length > 0) {
+                        if ($("#jobs-list li").length > 0) {
+                            $("#jobs-list li").remove();
+                        }
+                        $.each(data.list, function(i, e) {
+                            $("#jobs-list").append("<li>" + e + "</li>");
+                        });
+                    } else {
+                        $("#jobs-list").append("<li>No results</li>");
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+<div class="jumbotron">
+    <p class="lead">
+        @Html.TextBox("JobTitle", "", new { @placeholder = "Enter a job title" })
+        <a class="btn btn-primary btn-lg">Search</a>
+        <div>
+            These are the matching jobs:
+            <ul id="jobs-list"></ul>
+        </div>
+    </p>
+</div>
